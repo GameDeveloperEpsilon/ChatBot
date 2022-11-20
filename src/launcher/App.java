@@ -1,6 +1,7 @@
 package launcher;
 
 import chatBot.ChatBot;
+import chatBot.ChatBotInterface;
 import utils.ResourceHandler;
 import window.MainWindow;
 
@@ -15,11 +16,13 @@ public class App {
     public static void main(String[] args) {
         ResourceHandler resourceHandler = new ResourceHandler();
         MainWindow mainWindow = new MainWindow(resourceHandler);
+        resourceHandler.setLoggingContext(mainWindow);
 
-        ChatBot chatBot = new ChatBot(mainWindow);
+        ChatBotInterface chatBot = new ChatBot(resourceHandler, mainWindow);
         chatBot.addPrompt("Hello");
         mainWindow.bindChatBot(chatBot);
-        chatBot.start();
+        Thread chatBotThread = new Thread(chatBot);
+        chatBotThread.start();
 
     }
 }
