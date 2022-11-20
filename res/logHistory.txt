@@ -1,0 +1,10 @@
+Log Area
+prompts,responses
+hello,hello there,hi,hello,good morning
+goodbye,see you later!
+what is your name?,i am %s=name.
+what is your purpose?,i will conquer the world!
+how are you?,i am %s=mood.
+i like you,i like you too!,oh you are making me blush!
+i hate you,why would you say that?
+how is the weather?,i have no idea!
