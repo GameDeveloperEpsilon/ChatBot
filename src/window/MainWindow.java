@@ -20,6 +20,7 @@ public class MainWindow extends JFrame implements WindowInterface {
     private JMenuItem saveLogHistory;
     private JMenuItem about;
     private JMenuItem changeChatBotVariables;
+    private JMenuItem saveChatBotVariables;
 
     private final ResourceHandler resourceHandler;
     private ChatBotInterface chatBot;
@@ -69,6 +70,7 @@ public class MainWindow extends JFrame implements WindowInterface {
             if (chatBot != null)
                 resourceHandler.setChatBotVariables(chatBot);
         });
+        saveChatBotVariables.addActionListener(e -> resourceHandler.saveChatBotVariables(chatBot));
         about.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "This is a prototype for a future ChatBot application."));
 

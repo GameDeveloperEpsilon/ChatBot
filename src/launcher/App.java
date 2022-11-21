@@ -7,8 +7,6 @@ import window.MainWindow;
 
 public class App {
 
-    //public static final String resourcePath = System.getProperty("user.home") + "\\Appdata\\Local\\MyChatBot\\";
-
     /**
      * Entry point
      * @param args command line arguments - not used

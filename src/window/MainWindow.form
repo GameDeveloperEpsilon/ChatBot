@@ -99,6 +99,12 @@
                   <text resource-bundle="strings" key="changeChatBotVariables"/>
                 </properties>
               </component>
+              <component id="d14aa" class="javax.swing.JMenuItem" binding="saveChatBotVariables">
+                <constraints/>
+                <properties>
+                  <text resource-bundle="strings" key="saveChatBotVariables"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="1ec40" class="javax.swing.JMenu" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">

@@ -18,6 +18,8 @@ import java.util.TreeMap;
 
 public class ResourceHandler {
 
+    //public static final String resourcePath = System.getProperty("user.home") + "/Appdata/Local/MyChatBot";
+
     private WindowInterface loggingContext;
     private final TreeMap<String, BufferedImage> atlas;
     public final String chatbot_dataFilePath;
@@ -51,29 +53,35 @@ public class ResourceHandler {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void setChatBotVariables(ChatBotInterface chatBotInterface) {
-
+    public void getChatBotVariablesFromUser(ChatBotInterface chatBot) {
         // Get values from user
         String name = JOptionPane.showInputDialog("What is my name?");
         String mood = JOptionPane.showInputDialog("How am I feeling?");
 
         // Set instance variables
-        chatBotInterface.setName(name);
-        chatBotInterface.setMood(mood);
+        chatBot.setName(name);
+        chatBot.setMood(mood);
+    }
 
+    @SuppressWarnings("unchecked")
+    public void saveChatBotVariables(ChatBotInterface chatBot) {
         // Write to json file
         try (FileWriter writer = new FileWriter(chatbot_dataFilePath)){
 
-            JSONObject chatbot = new JSONObject();
+            JSONObject chatbotJSON = new JSONObject();
 
-            chatbot.put("name", name);
-            chatbot.put("mood", mood);
-            writer.write(chatbot.toJSONString());
+            chatbotJSON.put("name", chatBot.getName());
+            chatbotJSON.put("mood", chatBot.getMood());
+            writer.write(chatbotJSON.toJSONString());
             loggingContext.addLogItem("The file chatbot_data.json was updated.");
         } catch (IOException ex) {
             loggingContext.addLogItem("The file chatbot_data.json could not be updated.");
         }
+    }
+
+    public void setChatBotVariables(ChatBotInterface chatBot) {
+        getChatBotVariablesFromUser(chatBot);
+        saveChatBotVariables(chatBot);
     }
 
     public void loadAttributes(ChatBotInterface chatBotInterface) {
