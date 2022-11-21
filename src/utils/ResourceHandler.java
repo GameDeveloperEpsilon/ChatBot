@@ -19,12 +19,22 @@ import java.util.TreeMap;
 public class ResourceHandler {
 
     private WindowInterface loggingContext;
-
     private final TreeMap<String, BufferedImage> atlas;
+    public final String chatbot_dataFilePath;
+    public final String dialogueFilePath;
 
     public ResourceHandler() {
         atlas = new TreeMap<>();
-        // TODO Initialize Resources
+
+        URL chatbot_dataFile = getClass().getResource("/chatbot_data.json");
+        assert chatbot_dataFile != null;
+        chatbot_dataFilePath = chatbot_dataFile.getPath();
+
+        URL dialogueFile = getClass().getResource("/dialogue.csv");
+        assert dialogueFile != null;
+        dialogueFilePath = dialogueFile.getPath();
+
+        // Initialize Resources
         loadImages();
     }
 
@@ -42,28 +52,32 @@ public class ResourceHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private void initializeVariables(ChatBotInterface chatBotInterface, String filePath) {
-        try (FileWriter writer = new FileWriter(filePath)){
-            JSONObject chatbot = new JSONObject();
-            String name = JOptionPane.showInputDialog("What is my name?");
-            String mood = JOptionPane.showInputDialog("How am I feeling?");
+    public void setChatBotVariables(ChatBotInterface chatBotInterface) {
 
-            chatBotInterface.setName(name);
-            chatBotInterface.setMood(mood);
+        // Get values from user
+        String name = JOptionPane.showInputDialog("What is my name?");
+        String mood = JOptionPane.showInputDialog("How am I feeling?");
+
+        // Set instance variables
+        chatBotInterface.setName(name);
+        chatBotInterface.setMood(mood);
+
+        // Write to json file
+        try (FileWriter writer = new FileWriter(chatbot_dataFilePath)){
+
+            JSONObject chatbot = new JSONObject();
 
             chatbot.put("name", name);
             chatbot.put("mood", mood);
             writer.write(chatbot.toJSONString());
-            loggingContext.addLogItem("The file chatbot_data.json was fixed.");
+            loggingContext.addLogItem("The file chatbot_data.json was updated.");
         } catch (IOException ex) {
-            loggingContext.addLogItem("The file chatbot_data.json could not be fixed");
+            loggingContext.addLogItem("The file chatbot_data.json could not be updated.");
         }
     }
 
     public void loadAttributes(ChatBotInterface chatBotInterface) {
-        URL file = getClass().getResource("/chatbot_data.json");
-        assert file != null;
-        String filePath = file.getPath();
+        String filePath = chatbot_dataFilePath;
         try (FileReader fileReader = new FileReader(filePath)) {
 
             JSONParser parser = new JSONParser();
@@ -78,20 +92,18 @@ public class ResourceHandler {
         } catch (FileNotFoundException e) {
             loggingContext.addLogItem("The file chatbot_data.json could not be found.");
             createFile(filePath, "chatbot_data.json");
-            initializeVariables(chatBotInterface, filePath);
+            setChatBotVariables(chatBotInterface);
         } catch (IOException e) {
             loggingContext.addLogItem("The file chatbot_data.json could not be read.");
-            initializeVariables(chatBotInterface, filePath);
+            setChatBotVariables(chatBotInterface);
         } catch (ParseException e) {
             loggingContext.addLogItem("The file chatbot_data.json could not be parsed.");
-            initializeVariables(chatBotInterface, filePath);
+            setChatBotVariables(chatBotInterface);
         }
     }
 
     public TreeMap<String, ArrayList<String>> loadDialogue() {
-        URL file = getClass().getResource("/dialogue.csv");
-        assert file != null;
-        String filePath = file.getPath();
+        String filePath = dialogueFilePath;
         TreeMap<String, ArrayList<String>> responseMap = new TreeMap<>();
         try (FileReader fileReader = new FileReader(filePath);
              Scanner reader = new Scanner(fileReader)) {

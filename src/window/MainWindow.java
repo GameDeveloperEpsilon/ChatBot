@@ -19,8 +19,10 @@ public class MainWindow extends JFrame implements WindowInterface {
     private JLabel imageRegion;
     private JMenuItem saveLogHistory;
     private JMenuItem about;
+    private JMenuItem changeChatBotVariables;
 
     private final ResourceHandler resourceHandler;
+    private ChatBotInterface chatBot;
 
     public MainWindow(ResourceHandler resourceHandler) {
         this.resourceHandler = resourceHandler;
@@ -63,6 +65,10 @@ public class MainWindow extends JFrame implements WindowInterface {
                 }
             }
         });
+        changeChatBotVariables.addActionListener(e -> {
+            if (chatBot != null)
+                resourceHandler.setChatBotVariables(chatBot);
+        });
         about.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "This is a prototype for a future ChatBot application."));
 
@@ -104,6 +110,8 @@ public class MainWindow extends JFrame implements WindowInterface {
      */
     @Override
     public void bindChatBot(ChatBotInterface chatBot) {
+        this.chatBot = chatBot;
+        changeImage(chatBot.getMood());
         submit.addActionListener(e -> {
             addLogItem("Submitted Entry");
             String prompt = textEntry.getText();

@@ -66,7 +66,8 @@ public class ChatBot implements ChatBotInterface {
 
     @Override
     public void setMood(String mood) {
-        this.mood = mood;
+        if (mood != null)
+            this.mood = mood;
     }
 
     @Override
@@ -76,7 +77,8 @@ public class ChatBot implements ChatBotInterface {
 
     @Override
     public void setName(String name) {
-        this.name = name;
+        if (name != null)
+            this.name = name;
     }
 
     @Override

@@ -1,6 +1,11 @@
+/out/
+/workspace.xml
+.idea
+classDiagram.svg
+documentation.md
+src/moods
 # Default ignored files
 /shelf/
-/workspace.xml
 .mtj.tmp/
 *.class
 *.jar
@@ -8,8 +13,7 @@
 *.ear
 *.nar
 hs_err_pid*
-out/
-.idea/
+../out
 .idea_modules/
 *.ipr
 *.iws
