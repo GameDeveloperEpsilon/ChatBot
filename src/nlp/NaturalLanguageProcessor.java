@@ -5,6 +5,7 @@ import utils.Phrase;
 import utils.ResourceHandler;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 
@@ -67,19 +68,28 @@ public class NaturalLanguageProcessor implements NLPInterface {
 
     @Override
     public String respond() {
+        // Handle being not talked to
         if (prompts.size() == 0) {
             return "Are you there?";
         }
+
+        // Get first prompt
         String prompt = prompts.poll().getPhrase().toLowerCase();
 
+        // Handle mood changing phrase
         String answer = moodStateChange(prompt);
         if (answer != null)
             return answer;
 
+        // Get response candidates
         ArrayList<String> candidateResponses = responseMap.get(prompt);
+
+        // Handle incomprehensible phrase
         if (candidateResponses == null) {
             return "I do not understand you.";
         }
+
+        // Handle comprehensible phrase
         //int responseNumber = new Random(System.currentTimeMillis()).nextInt(0, candidateResponses.size());
         int moodNum = switch (context.getMood()) {
             case "annoyed" -> 1;
@@ -87,13 +97,15 @@ public class NaturalLanguageProcessor implements NLPInterface {
             case "grumpy" -> 3;
             default -> 0;
         };
-        String rawResponse = candidateResponses.get(moodNum);
-        String response = rawResponse;
-        if (rawResponse.contains("%s=name")) {
-            response = rawResponse.replace("%s=name", context.getName());
+        String response = candidateResponses.get(moodNum);
+        if (response.contains("%s=name")) {
+            response = response.replace("%s=name", context.getName());
         }
-        if (rawResponse.contains("%s=mood")) {
-            response = rawResponse.replace("%s=mood", context.getMood());
+        if (response.contains("%s=mood")) {
+            response = response.replace("%s=mood", context.getMood());
+        }
+        if (response.contains("%s=time")) {
+            response = response.replace("%s=time", new Date().toString());
         }
         return response;
     }
