@@ -16,7 +16,7 @@ public class App {
         MainWindow mainWindow = new MainWindow(resourceHandler);
         resourceHandler.setLoggingContext(mainWindow);
 
-        ChatBotInterface chatBot = new ChatBot(resourceHandler, mainWindow);
+        ChatBotInterface chatBot = ChatBot.FromFileFactory(resourceHandler, mainWindow);
         chatBot.addPrompt("Hello");
         mainWindow.bindChatBot(chatBot);
         Thread chatBotThread = new Thread(chatBot);

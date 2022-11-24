@@ -6,36 +6,36 @@ import utils.ResourceHandler;
 import window.WindowInterface;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChatBot implements ChatBotInterface {
 
-    private final ResourceHandler resourceHandler;
+    private static final ArrayList<String> moods = new ArrayList<>(List.of("happy", "sad", "grumpy", "annoyed"));
+
     private final WindowInterface context;
     private final NLPInterface naturalLanguageProcessor;
-    private final ArrayList<String> moods;
     private String name, mood;
 
-    public ChatBot(ResourceHandler resourceHandler, WindowInterface context) {
+    public static ChatBot FromFileFactory(ResourceHandler resourceHandler, WindowInterface window) {
+        ChatBot chatBot = new ChatBot(resourceHandler, window);
 
-        this.resourceHandler = resourceHandler;
+        resourceHandler.loadAttributes(chatBot, "ChatBot");
+
+        return chatBot;
+    }
+
+    public static ChatBot FromDefaultFactory(ResourceHandler resourceHandler, WindowInterface context) {
+        ChatBot chatBot = new ChatBot(resourceHandler, context);
+        chatBot.setName("Default");
+        chatBot.setMood("happy");
+        return chatBot;
+    }
+
+    private ChatBot(ResourceHandler resourceHandler, WindowInterface context) {
+
         this.context = context;
         this.naturalLanguageProcessor = new NaturalLanguageProcessor(resourceHandler, this);
 
-        moods = new ArrayList<>();
-        moods.add("happy");
-        moods.add("sad");
-        moods.add("grumpy");
-        moods.add("annoyed");
-
-        loadAttributes();
-
-    }
-
-    /**
-     * Loads ChatBot attributes.
-     */
-    private void loadAttributes() {
-        resourceHandler.loadAttributes(this);
     }
 
     /**

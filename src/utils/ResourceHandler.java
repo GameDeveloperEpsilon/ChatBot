@@ -1,9 +1,9 @@
 package utils;
 
+import chatBot.ChatBot;
 import chatBot.ChatBotInterface;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import window.WindowInterface;
 
 import javax.imageio.ImageIO;
@@ -22,15 +22,15 @@ public class ResourceHandler {
 
     private WindowInterface loggingContext;
     private final TreeMap<String, BufferedImage> atlas;
-    public final String chatbot_dataFilePath;
+    public final String chatBot_dataFilePath;
     public final String dialogueFilePath;
 
     public ResourceHandler() {
         atlas = new TreeMap<>();
 
-        URL chatbot_dataFile = getClass().getResource("/chatbot_data.json");
-        assert chatbot_dataFile != null;
-        chatbot_dataFilePath = chatbot_dataFile.getPath();
+        URL chatBot_dataFile = getClass().getResource("/chatBot_data.json");
+        assert chatBot_dataFile != null;
+        chatBot_dataFilePath = chatBot_dataFile.getPath();
 
         URL dialogueFile = getClass().getResource("/dialogue.csv");
         assert dialogueFile != null;
@@ -63,19 +63,22 @@ public class ResourceHandler {
         chatBot.setMood(mood);
     }
 
-    @SuppressWarnings("unchecked")
     public void saveChatBotVariables(ChatBotInterface chatBot) {
+
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+
+        Gson gson = builder.create();
+        String chatBotJSON = gson.toJson(chatBot);
+
         // Write to json file
-        try (FileWriter writer = new FileWriter(chatbot_dataFilePath)){
+        try (FileWriter writer = new FileWriter(chatBot_dataFilePath)) {
 
-            JSONObject chatbotJSON = new JSONObject();
+            writer.write(chatBotJSON);
+            loggingContext.addLogItem("The file chatBot_data.json was updated.");
 
-            chatbotJSON.put("name", chatBot.getName());
-            chatbotJSON.put("mood", chatBot.getMood());
-            writer.write(chatbotJSON.toJSONString());
-            loggingContext.addLogItem("The file chatbot_data.json was updated.");
         } catch (IOException ex) {
-            loggingContext.addLogItem("The file chatbot_data.json could not be updated.");
+            loggingContext.addLogItem("The file chatBot_data.json could not be updated.");
         }
     }
 
@@ -84,30 +87,36 @@ public class ResourceHandler {
         saveChatBotVariables(chatBot);
     }
 
-    public void loadAttributes(ChatBotInterface chatBotInterface) {
-        String filePath = chatbot_dataFilePath;
+    public void loadAttributes(ChatBotInterface chatBot, String type) {
+
+        String filePath = chatBot_dataFilePath;
+
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+
+        Gson gson = builder.create();
+
         try (FileReader fileReader = new FileReader(filePath)) {
 
-            JSONParser parser = new JSONParser();
-            JSONObject chatBotData = (JSONObject) parser.parse(fileReader);
-
-            String name = (String) chatBotData.get("name");
-            String mood = (String) chatBotData.get("mood");
-
-            chatBotInterface.setName(name);
-            chatBotInterface.setMood(mood);
+            if (type.equals("ChatBot")) {
+                ChatBot temp = gson.fromJson(fileReader, ChatBot.class);
+                chatBot.setName(temp.getName());
+                chatBot.setMood(temp.getMood());
+            } else {
+                throw new RuntimeException("Load Attributes: ChatBot type does not exist!");
+            }
 
         } catch (FileNotFoundException e) {
-            loggingContext.addLogItem("The file chatbot_data.json could not be found.");
-            createFile(filePath, "chatbot_data.json");
-            setChatBotVariables(chatBotInterface);
+            loggingContext.addLogItem("The file chatBot_data.json could not be found.");
+            createFile(filePath, "chatBot_data.json");
+            ChatBotInterface cBot = ChatBot.FromDefaultFactory(this, loggingContext);
+            setChatBotVariables(cBot);
         } catch (IOException e) {
-            loggingContext.addLogItem("The file chatbot_data.json could not be read.");
-            setChatBotVariables(chatBotInterface);
-        } catch (ParseException e) {
-            loggingContext.addLogItem("The file chatbot_data.json could not be parsed.");
-            setChatBotVariables(chatBotInterface);
+            loggingContext.addLogItem("The file chatBot_data.json could not be read.");
+            ChatBotInterface cBot = ChatBot.FromDefaultFactory(this, loggingContext);
+            setChatBotVariables(cBot);
         }
+
     }
 
     public TreeMap<String, ArrayList<String>> loadDialogue() {
